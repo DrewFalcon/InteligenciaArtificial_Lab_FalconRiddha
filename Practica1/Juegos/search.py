@@ -49,7 +49,7 @@ class CornerReversiState:
           Returns a list of legal moves from the current state.
         """
         next_player = self.player2 if self.cur_player == self.player1 else self.player1
-        return """YOUR CODE HERE""" # RETURN THE LIST OF VALID MOVES
+        return  get_valid_moves(self.board, self.height, self.width, self.cur_player, next_player, self.blocked_cell_label, self.ignore_block_cells_in_captures) #"""YOUR CODE HERE""" # RETURN THE LIST OF VALID MOVES
 
     def result(self, move):
         """
@@ -64,8 +64,8 @@ class CornerReversiState:
         result_board[move] = self.cur_player
         # flip enemy
         for enemy in enemy_captured_by_move(self.board, move, self.cur_player, adversary, self.blocked_cell_label, self.ignore_block_cells_in_captures):
-            result_board[enemy] = """YOUR CODE HERE""" # update the board
-        return """YOUR CODE HERE""" # RETURN THE NEW STATE CONSIDERING THE UPDATES
+            result_board[enemy] =  self.cur_player.label #"""YOUR CODE HERE""" # update the board
+        return result_board #"""YOUR CODE HERE""" # RETURN THE NEW STATE CONSIDERING THE UPDATES
 
     # Utilities for comparison and display
     def __eq__(self, other):
