@@ -196,7 +196,83 @@ def build_game_tree(search_problem, max_depth):
 
     """YOUR CODE HERE"""
 
-    return None, stats
+    # Okay first idea, create all possible end results of a position first
+    # Num of total options (from player to enemy)
+    # Max_ depth I will add for every child I create. For every for loop.
+
+    # Gonna have to be a a recursive function(?)
+
+    # 1. Get initial state and create root node
+    root_state = search_problem.getStartState()
+    root = {
+        'state': root_state,
+        'depth': 0,
+        'action': None,
+        'children': []
+    }
+
+    # Initialize values
+    stats['nodes'] = 1
+    stats['max_depth'] = 0
+
+    # Create Queue
+    queue = util.Queue()
+    queue.push(root)
+
+
+    """
+    VAMOS A INTENTAR HACER UNA SEQUENCIA DE BREADTH/ANCHURA FIRST EN VEZ DE PROFUNDIDAD
+    1)Generate succesors in current move
+    2)add max_depth 1
+
+    3)create empty list of first sucesors UTILIZANDO COLAS QUEUE FIRST IN FIRST OUT
+    4.1) create a counter for current uhhhhhhh nodes of this level
+
+
+    4)for every succesor in succesors THAT ARENT AT END GAME:
+        5.1) add += stats.nodes
+        5)generate succesors
+        6)add to list IF ITS NOT AT END GAME
+        6.2) minus one to the counter
+    7) add max depth 1
+    8) if list isnt empty, 
+        8.1) update the counter (which should be at 0), to reflect the CURRENT LEVEL OF NODES
+        8.2) continue the loop at the new amount of things
+    """
+
+    # Expandir mientras haya nodos en la cola
+    while not queue.isEmpty():
+        node = queue.pop()
+        current_depth = node['depth']
+
+        # Only expanding if max depth hasnt been reached
+        if current_depth < max_depth:
+            successors = search_problem.getSuccessors(node['state'])
+
+            if successors:
+
+                stats['internal_nodes'] += 1
+                stats['branching_sum'] += len(successors)
+
+                for succ_state, action in successors:
+                    child = {
+                        'state': succ_state,
+                        'depth': current_depth + 1,
+                        'action': action,
+                        'children': []
+                    }
+                    node['children'].append(child)
+                    stats['nodes'] += 1
+                    stats['max_depth'] = max(stats['max_depth'], current_depth + 1)
+                    queue.push(child)
+
+            # Else:  #es nodo hoja
+                # stats['leaves'] += 1
+
+    # Calculate leaves
+    stats['leaves'] = stats['nodes'] - stats['internal_nodes']
+
+    return root, stats
 
 
 def depthFirstSearch(search_problem):
