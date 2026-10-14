@@ -202,7 +202,7 @@ def build_game_tree(search_problem, max_depth):
 
     # Gonna have to be a a recursive function(?)
 
-    # 1. Get initial state and create root node
+    # Get initial state and create root node
     root_state = search_problem.getStartState()
     root = {
         'state': root_state,
@@ -296,7 +296,7 @@ def depthFirstSearch(search_problem):
 
     while not structure.isEmpty():
         path = structure.pop()
-        current_state = """YOUR CODE HERE""" # INDEX THE CURRENT STATE
+        current_state =  """YOUR CODE HERE""" # INDEX THE CURRENT STATE
 
         if search_problem.isGoalState(current_state):
             return """YOUR CODE HERE""" # RETURN THE PATH OF STATES
@@ -315,6 +315,48 @@ def depthFirstSearch(search_problem):
 def breadthFirstSearch(search_problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+
+    #  Get initial state and 
+    root = search_problem.getStartState()
+
+
+    # Create Queue
+    queue = util.Queue()
+    queue.push(root)
+
+    visited = []
+
+
+    # Expandir mientras haya nodos en la cola
+    while not queue.isEmpty():
+        node = queue.pop()
+        current_depth = node['depth']
+        #visited.append(node)
+
+        if node not in visited:
+            visited.append(node)
+
+
+        if search_problem.isGoalState(node['state']):
+                    return visited #"""YOUR CODE HERE""" # RETURN THE PATH OF STATES
+
+
+
+        successors = search_problem.getSuccessors(node['state'])
+
+        if successors:
+            for succ_state, action in successors:
+                child = {
+                    'state': succ_state,
+                    'depth': current_depth + 1,
+                    'action': action,
+                    'children': []
+                }
+                node['children'].append(child)
+
+                queue.push(child)
+
+
     raise NotImplementedError
 
 
@@ -339,7 +381,6 @@ def heuristic1(state, search_problem=None):
 
 def heuristic2(state, search_problem=None):
     "*** YOUR CODE HERE ***"
-    return 0
 
 
 def heuristic3(state, search_problem=None):
