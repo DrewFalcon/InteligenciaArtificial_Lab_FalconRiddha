@@ -244,11 +244,6 @@ class Solution4(StudentHeuristic):
                 valores_bordes_rival += 1
 
 
-            # SI UNA PIEZA DEL BORDE ESTA ALREDEDOR DE UNA ESQUINA,
-        # Y ESTA ESQUINA ESTA VACIA
-        # SU VALOR DEBE DE SER NEGATIVO O POCO, ES DECIR, ES MALO
-        # SOBRE TODO SI ES DIAGONAL
-
         valores_peligro_yo = 0
         valores_peligro_rival = 0
 
