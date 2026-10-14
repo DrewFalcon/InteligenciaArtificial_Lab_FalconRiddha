@@ -21,6 +21,7 @@ from p1_1311_10_Ridda_Falcon import (
     Solution1,
     Solution2,
     Solution3,
+    Solution4, # Solo para probar una solucion extra
 )
 
 class Heuristic1(StudentHeuristic):
