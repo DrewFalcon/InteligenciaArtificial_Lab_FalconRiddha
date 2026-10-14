@@ -20,7 +20,7 @@ def func_glob(n: int, state: TwoPlayerGameState) -> float:
 
 class Solution1(StudentHeuristic):
     def get_name(self) -> str:
-        return "solution1"
+        return "ruleta_neozelandesa"
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         # let's use an auxiliary function
@@ -33,10 +33,12 @@ class Solution1(StudentHeuristic):
 
         valores_esquina_yo = 0
         valores_esquina_rival = 0
-        valores_peligroso_yo = 0
-        valores_peligroso_rival = 0
         esquinas = [(1,1), (1,8), (8,1), (8,8)] #esquinas, valen mas
-        peligroso = [(1,2), (2,1), (1,7), (2,8), (7,1), (8,2), (7,8), (8,7)] #peligroso puede regalar esquina
+        bordes = [(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),
+                  (8,2),(8,3),(8,4),(8,5),(8,6),(8,7),
+                  (2,1),(3,1),(4,1),(5,1),(6,1),(7,1),
+                  (2,8),(3,8),(4,8),(5,8),(6,8),(7,8)
+                  ]
         for a in esquinas:
             if state_actual.get(a) == color_yo:
                 valores_esquina_yo += 1
@@ -44,20 +46,38 @@ class Solution1(StudentHeuristic):
                 valores_esquina_rival += 1
         resultado_esquinas = valores_esquina_yo - valores_esquina_rival
 
-        for b in peligroso:
-            if state_actual.get(b) == color_yo:
-                valores_peligroso_yo+= 1
-            elif state_actual.get(b) == color_rival:
-                valores_peligroso_rival+= 1
-        resultado_peligrosos = valores_peligroso_yo - valores_peligroso_rival
-        return resultado_esquinas * 50 - resultado_peligrosos * 5
+        movimientos_yo = get_valid_moves(
+            state_actual, 8, 8, color_yo, color_rival, 'O', False
+        )
+        movimientos_rival = get_valid_moves(
+            state_actual, 8, 8, color_rival, color_yo, 'O', False
+        )
+
+        diferencia_movilidad = len(movimientos_yo) - len(movimientos_rival)
+
+        bordes_yo = 0
+        bordes_rival = 0
+
+        for pos in bordes:
+            if state_actual.get(pos) == color_yo:
+                bordes_yo += 1
+            elif state_actual.get(pos) == color_rival:
+                bordes_rival += 1
+
+        diferencia_bordes = bordes_yo - bordes_rival
+
+        return (50 * resultado_esquinas
+            + 5 * diferencia_movilidad
+            + 2 * diferencia_bordes)
     
+
 
 
 class Solution2(StudentHeuristic):
+
     def get_name(self) -> str:
-        return "solution2"
-    
+        return "kiwi_australiano_borde"
+
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         state_actual = state.board
         color_yo = state.player_max.label
@@ -65,99 +85,53 @@ class Solution2(StudentHeuristic):
             color_rival = "B"
         else:
             color_rival = "W"
-        valores_esquina_yo = 0
-        valores_esquina_rival = 0
-        valores_centro_yo = 0
-        valores_centro_rival = 0
-        valores_centroS_yo = 0
-        valores_centroS_rival = 0
-        valores_diagonalP_yo = 0
-        valores_diagonalP_rival = 0
-        valores_diagonalS_yo = 0
-        valores_diagonalS_rival = 0     
-        valores_otros_yo = 0
-        valores_otros_rival = 0 
-        esquinas = [(1,1),(1,8),(8,1),(8,8)]
-        centro_muy_valioso = [(4,4),(4,5),(5,4),(5,5)]
-        centro_valioso =  [(3,3), (3,4), (3,5), (3,6), (4,3), (4,6), (5,3), (5,6), (6,3), (6,4), (6,5), (6,6)]
-        diagonal_1 = [(3,3),(4,4),(5,5),(6,6)]
-        diagonal_2 = [(6,3),(5,4),(4,5),(3,6)]
-        sub_diagonal2= [(6,2),(5,3),(4,4),(3,5),(2,6),(7,3),(6,4),(5,5),(4,6),(3,7)]
-        sub_diagonal1= [(2,3),(3,4),(4,5),(5,6),(6,7),(3,2),(4,3),(5,4),(6,5),(7,6)]
-        otros_importantes=[(1,4),(1,5),(4,1),(5,1),(4,8),(5,8),(8,4),(8,5)]
 
-        for a in esquinas:
-            if state_actual.get(a) == color_yo:
-                valores_esquina_yo += 1
-            elif state_actual.get(a) == color_rival:
-                valores_esquina_rival += 1
-        resultado_esquinas = valores_esquina_yo - valores_esquina_rival
-        for a in centro_muy_valioso:
-            if state_actual.get(a) == color_yo:
-                valores_centro_yo += 1
-            elif state_actual.get(a) == color_rival:
-                valores_centro_rival += 1
-        resultado_centro = valores_centro_yo - valores_centro_rival
-        for a in centro_valioso:
-            if state_actual.get(a) == color_yo:
-                valores_centroS_yo += 1
-            elif state_actual.get(a) == color_rival:
-                valores_centroS_rival += 1
-        resultado_centroS = valores_centroS_yo - valores_centroS_rival
-        for a in diagonal_1 + diagonal_2:
-            if state_actual.get(a) == color_yo:
-                valores_diagonalP_yo += 1
-            elif state_actual.get(a) == color_rival:
-                valores_diagonalP_rival += 1
-        resultado_diagonalP = valores_diagonalP_yo - valores_diagonalP_rival
-        for a in sub_diagonal1 + sub_diagonal2:
-            if state_actual.get(a) == color_yo:
-                valores_diagonalS_yo += 1
-            elif state_actual.get(a) == color_rival:
-                valores_diagonalS_rival += 1
-        resultado_diagonalS = valores_diagonalS_yo - valores_diagonalS_rival
-        for a in otros_importantes:
-            if state_actual.get(a) == color_yo:
-                valores_otros_yo += 1
-            elif state_actual.get(a) == color_rival:
-                valores_otros_rival += 1
-        resultado_otros = valores_otros_yo - valores_otros_rival
+        fichas_yo = sum(1 for v in state_actual.values() if v == color_yo)
+        fichas_rival = sum(1 for v in state_actual.values() if v == color_rival)
+        diferencia_fichas = fichas_yo - fichas_rival
+
+        movimientos_yo = get_valid_moves(
+            state_actual, 8, 8, color_yo, color_rival, 'O', False
+        )
+        movimientos_rival = get_valid_moves(
+            state_actual, 8, 8, color_rival, color_yo, 'O', False
+        )
+
+        diferencia_movilidad = len(movimientos_yo) - len(movimientos_rival)
+
+        bordes_esquinas = [
+            ((1, 1), [(1, 2), (2, 1)]),
+            ((1, 8), [(1, 7), (2, 8)]),
+            ((8, 1), [(7, 1), (8, 2)]),
+            ((8, 8), [(7, 8), (8, 7)])
+        ]
+
+        bordes_yo = 0
+        bordes_rival = 0
+
+        for esquina, posiciones in bordes_esquinas:
+            if state_actual.get(esquina) is None:
+                for pos in posiciones:
+                    if state_actual.get(pos) == color_yo:
+                        bordes_yo += 1
+                    elif state_actual.get(pos) == color_rival:
+                        bordes_rival += 1
+
+        diferencia_bordes = bordes_yo - bordes_rival
+
+        return (
+            diferencia_fichas
+            + 5 * diferencia_movilidad
+            - 5 * diferencia_bordes
+        )
 
 
-        return resultado_esquinas * 80 + resultado_centro * 30 + resultado_centroS * 10 + resultado_diagonalP * 15 + resultado_diagonalS * 8 + resultado_otros * 6
-
-
-
-    
-class Solution3(StudentHeuristic):
-
-    def get_name(self) -> str:
-        return "solution3"
-
-    def evaluation_function(self, state: TwoPlayerGameState) -> float:
-        board = state.board
-        color_yo = state.player_max.label
-        color_rival = "B" if color_yo == "W" else "W"
-
-        esquinas = [(1, 1), (1, 8), (8, 1), (8, 8)]
-
-        valores_esquina_yo = 0
-        valores_esquina_rival = 0
-
-        for pos in esquinas:
-            if board.get(pos) == color_yo:
-                valores_esquina_yo += 1
-            elif board.get(pos) == color_rival:
-                valores_esquina_rival += 1
-
-        return 30 * (valores_esquina_yo - valores_esquina_rival)
-    
 def dummy(n: int) -> int:
             return n + 1
 
 
 
-class Solution4(StudentHeuristic):
+class Solution3(StudentHeuristic):
     def get_name(self) -> str:
         return "Bordes_Peligrosos_con_un_poco_de_sal" 
 
