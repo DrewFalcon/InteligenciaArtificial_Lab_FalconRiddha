@@ -124,7 +124,7 @@ class Solution2(StudentHeuristic):
         resultado_otros = valores_otros_yo - valores_otros_rival
 
 
-        return resultado_esquinas * 30 + resultado_centro * 30 + resultado_centroS * 10 + resultado_diagonalP * 15 + resultado_diagonalS * 8 + resultado_otros * 6
+        return resultado_esquinas * 80 + resultado_centro * 30 + resultado_centroS * 10 + resultado_diagonalP * 15 + resultado_diagonalS * 8 + resultado_otros * 6
 
 
 
@@ -159,7 +159,7 @@ def dummy(n: int) -> int:
 
 class Solution4(StudentHeuristic):
     def get_name(self) -> str:
-        return "solution4" #  En realidad es solucion 4 pero se mantiene asi para probar mas facil
+        return "Bordes_Peligrosos_con_un_poco_de_sal" 
 
 
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
@@ -186,30 +186,16 @@ class Solution4(StudentHeuristic):
 
 
 
-        ######################################################
-        # Obtener cantidad de fichas 
-
-            # Obtener del jugador
-            # Obtener del oponente
-
-
-
-
-        ######################################################
-        ######################################################
-
         # Obtener cantidad de Movimientos del jugador
         mov_yo = get_valid_moves(board, 8, 8, color_yo, color_rival, bloqueadas, False)
-        num_mov_yo = len(mov_yo)
+        #num_mov_yo = len(mov_yo)
         # Obtener cantidad de movimientos del opponente
         mov_rival = get_valid_moves(board, 8, 8, color_rival, color_yo, bloqueadas, False)
-        num_mov_rival = len(mov_rival)
-
-
-        #print(f"Movimientos del jugador: {mov_yo}\n Movimientos del Enemigo: {mov_rival}")
-
+        #num_mov_rival = len(mov_rival)
 
         # Obtener cantidad de piezas en las esquinas
+        # malos puntos si en esquinas esta en mov legales del oponente 
+
         valores_esquina_yo = 0
         valores_esquina_rival = 0
         valores_posibles_esquina_yo = 0
@@ -224,10 +210,6 @@ class Solution4(StudentHeuristic):
                 valores_esquina_rival += 1
                 if board.get(a) in mov_rival:
                     valores_posibles_esquina_rival += 1
-
-
-        # malos puntos si en esquinas esta en mov legales del oponente 
-
 
 
 
@@ -280,28 +262,8 @@ class Solution4(StudentHeuristic):
                     valores_peligro_rival -= 1  
 
 
-
-
-
-        # buenos(?) puntos si en esquinas esta en mov legales del oponente y esquina esta vacio(?)
-
-
-
-
-
-
-
-
-
-
-
         return (  50 * (valores_esquina_yo - valores_esquina_rival) 
                 + 30 * (valores_posibles_esquina_yo - valores_posibles_esquina_rival)
                 + 20 * (valores_bordes_yo - valores_bordes_rival)
                 + 20 * (valores_peligro_yo - valores_peligro_rival)) 
-                # + Valores de fichas totales?
     
-
-    def dummy(n: int) -> int:
-            return n + 1
-
