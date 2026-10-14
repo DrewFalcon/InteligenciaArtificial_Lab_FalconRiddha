@@ -57,7 +57,7 @@ class Solution1(StudentHeuristic):
 class Solution2(StudentHeuristic):
     def get_name(self) -> str:
         return "solution2"
-
+    
     def evaluation_function(self, state: TwoPlayerGameState) -> float:
         state_actual = state.board
         color_yo = state.player_max.label
@@ -124,7 +124,7 @@ class Solution2(StudentHeuristic):
         resultado_otros = valores_otros_yo - valores_otros_rival
 
 
-        return resultado_esquinas * 30 + resultado_centro * 30 + resultado_centroS * 10 + resultado_diagonalP * 15 + resultado_diagonalS * 8 + resultado_otros * 6
+        return resultado_esquinas * 80 + resultado_centro * 30 + resultado_centroS * 10 + resultado_diagonalP * 15 + resultado_diagonalS * 8 + resultado_otros * 6
 
 
 
@@ -154,3 +154,116 @@ class Solution3(StudentHeuristic):
     
 def dummy(n: int) -> int:
             return n + 1
+
+
+
+class Solution4(StudentHeuristic):
+    def get_name(self) -> str:
+        return "Bordes_Peligrosos_con_un_poco_de_sal" 
+
+
+    def evaluation_function(self, state: TwoPlayerGameState) -> float:
+        board = state.board
+        color_yo = state.player_max.label
+        color_rival = "B" if color_yo == "W" else "W"
+
+        bloqueadas = 'O' #state.blocked_cell_label
+
+        esquinas = [(1, 1), (1, 8), (8, 1), (8, 8)]
+
+        # Bordes sin peligro
+        bordes_left =   [(1,3), (1,4), (1,5), (1,6) ]
+        bordes_right = [(8,3), (8,4), (8,5), (8,6) ]
+        bordes_up = [(3,1), (4,1), (5,1), (6,1) ]
+        bordes_down = [(3,8), (4,8), (5,8), (6,8) ]
+
+        # Bordes que dejan al oponente tomar la esquina
+        # y una vez que se hace esto cualquier linea que hubiese esta tomada ya
+        bordes_upLeft_danger = [(1,2), (2,1), (2,2)]
+        bordes_upRight_danger = [(7,1), (8, 2), (7,2)]
+        bordes_downRight_danger = [(7,8), (8,7), (7,7)] 
+        bordes_downLeft_danger = [(1,7), (2,8), (2,7)] 
+
+
+
+        # Obtener cantidad de Movimientos del jugador
+        mov_yo = get_valid_moves(board, 8, 8, color_yo, color_rival, bloqueadas, False)
+        #num_mov_yo = len(mov_yo)
+        # Obtener cantidad de movimientos del opponente
+        mov_rival = get_valid_moves(board, 8, 8, color_rival, color_yo, bloqueadas, False)
+        #num_mov_rival = len(mov_rival)
+
+        # Obtener cantidad de piezas en las esquinas
+        # malos puntos si en esquinas esta en mov legales del oponente 
+
+        valores_esquina_yo = 0
+        valores_esquina_rival = 0
+        valores_posibles_esquina_yo = 0
+        valores_posibles_esquina_rival = 0
+
+        for a in esquinas:
+            if board.get(a) == color_yo:
+                valores_esquina_yo += 1
+                if board.get(a) in mov_yo:
+                    valores_posibles_esquina_yo += 1
+            elif board.get(a) == color_rival:
+                valores_esquina_rival += 1
+                if board.get(a) in mov_rival:
+                    valores_posibles_esquina_rival += 1
+
+
+
+        # obtener cantidad de piezas en los bordes
+            # BORDES SEGUROS
+
+        valores_bordes_yo = 0
+        valores_bordes_rival = 0
+
+        for a in bordes_left + bordes_down + bordes_right + bordes_up:
+            if board.get(a) == color_yo:
+                valores_bordes_yo += 1
+            elif board.get(a) == color_rival:
+                valores_bordes_rival += 1
+
+
+        valores_peligro_yo = 0
+        valores_peligro_rival = 0
+
+
+        for b in bordes_upLeft_danger:
+            if (8, 8) not in board:
+                if board.get(b) == color_yo:
+                    valores_peligro_yo -= 1
+                elif board.get(b) == color_rival:
+                    valores_peligro_rival -= 1
+
+        for b in bordes_upRight_danger:
+            if (8, 8) not in board:
+                if board.get(b) == color_yo:
+                    valores_peligro_yo -= 1
+                elif board.get(b) == color_rival:
+                    valores_peligro_rival -= 1
+
+        
+        for b in bordes_downLeft_danger:
+            if (8, 8) not in board:
+                if board.get(b) == color_yo:
+                    valores_peligro_yo -=1
+                elif board.get(b) == color_rival:
+                    valores_peligro_rival -= 1
+
+
+        
+        for b in bordes_downRight_danger:
+            if (8, 8) not in board:
+                if board.get(b) == color_yo:
+                    valores_peligro_yo -= 1
+                elif board.get(b) == color_rival:
+                    valores_peligro_rival -= 1  
+
+
+        return (  50 * (valores_esquina_yo - valores_esquina_rival) 
+                + 30 * (valores_posibles_esquina_yo - valores_posibles_esquina_rival)
+                + 20 * (valores_bordes_yo - valores_bordes_rival)
+                + 20 * (valores_peligro_yo - valores_peligro_rival)) 
+    
