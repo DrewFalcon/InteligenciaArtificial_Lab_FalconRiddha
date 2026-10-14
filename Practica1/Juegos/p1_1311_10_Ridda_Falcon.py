@@ -154,3 +154,5 @@ class Solution3(StudentHeuristic):
     
 def dummy(n: int) -> int:
             return n + 1
+
+
