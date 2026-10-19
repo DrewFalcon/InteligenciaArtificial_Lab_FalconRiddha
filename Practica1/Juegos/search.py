@@ -49,7 +49,7 @@ class CornerReversiState:
           Returns a list of legal moves from the current state.
         """
         next_player = self.player2 if self.cur_player == self.player1 else self.player1
-        return  get_valid_moves(self.board, self.height, self.width, self.cur_player, next_player, self.blocked_cell_label, self.ignore_block_cells_in_captures) #"""YOUR CODE HERE""" # RETURN THE LIST OF VALID MOVES
+        return  get_valid_moves(self.board, self.height, self.width, self.cur_player, next_player, self.blocked_cell_label, self.ignore_block_cells_in_captures) # RETURN THE LIST OF VALID MOVES
 
     def result(self, move):
         """
@@ -64,8 +64,10 @@ class CornerReversiState:
         result_board[move] = self.cur_player
         # flip enemy
         for enemy in enemy_captured_by_move(self.board, move, self.cur_player, adversary, self.blocked_cell_label, self.ignore_block_cells_in_captures):
-            result_board[enemy] =  self.cur_player.label #"""YOUR CODE HERE""" # update the board
-        return result_board #"""YOUR CODE HERE""" # RETURN THE NEW STATE CONSIDERING THE UPDATES
+            result_board[enemy] =  self.cur_player # update the board
+        return CornerReversiState(
+            result_board, self.cur_player, adversary, self.cur_player,
+            self.height, self.width, self.ignore_block_cells_in_captures) # RETURN THE NEW STATE CONSIDERING THE UPDATES
 
     # Utilities for comparison and display
     def __eq__(self, other):
@@ -194,7 +196,6 @@ def build_game_tree(search_problem, max_depth):
         "internal_nodes": 0,
         }
 
-    """YOUR CODE HERE"""
 
     # Okay first idea, create all possible end results of a position first
     # Num of total options (from player to enemy)
@@ -314,18 +315,15 @@ def depthFirstSearch(search_problem):
 
 def breadthFirstSearch(search_problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
 
     #  Get initial state and 
     root = search_problem.getStartState()
-
 
     # Create Queue
     queue = util.Queue()
     queue.push(root)
 
     visited = []
-
 
     # Expandir mientras haya nodos en la cola
     while not queue.isEmpty():
@@ -338,7 +336,7 @@ def breadthFirstSearch(search_problem):
 
 
         if search_problem.isGoalState(node['state']):
-                    return visited #"""YOUR CODE HERE""" # RETURN THE PATH OF STATES
+                    return visited # RETURN THE PATH OF STATES
 
 
 
@@ -391,6 +389,36 @@ def heuristic3(state, search_problem=None):
 def aStarSearch(search_problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+
+    #  Get initial state  
+    root = search_problem.getStartState()
+
+    # Create Queue
+    queue = util.PriorityQueue() 
+        # Se añadiran tuplas de
+        # [valor funcion, valor real g, estado actual, camino recorrido]
+    queue.push([0 + heuristic(root, search_problem), 0, root, [root]]) 
+
+    visited = [] 
+
+    while queue:
+        f, g, actual, camino = queue.pop
+
+        if search_problem.isGoalState(actual):
+            return camino
+
+        # Estados siguientes
+        futures = search_problem.getSuccesors(actual)
+
+        for future in futures:
+            if future not in visited:
+                nuevo_g = g + 1 # En reversi el coste es un paso (1)
+                nuevo_f = nuevo_g + heuristic(actual, search_problem)
+
+                queue.push([nuevo_f, nuevo_g, future, (camino + [future]) ], nuevo_f)
+
+
+
     raise NotImplementedError
 
 
