@@ -66,7 +66,7 @@ class CornerReversiState:
         for enemy in enemy_captured_by_move(self.board, move, self.cur_player, adversary, self.blocked_cell_label, self.ignore_block_cells_in_captures):
             result_board[enemy] =  self.cur_player # update the board
         return CornerReversiState(
-            result_board, self.cur_player, adversary, self.cur_player,
+            result_board, self.player1, self.player2, adversary,
             self.height, self.width, self.ignore_block_cells_in_captures) # RETURN THE NEW STATE CONSIDERING THE UPDATES
 
     # Utilities for comparison and display
@@ -317,40 +317,59 @@ def breadthFirstSearch(search_problem):
     """Search the shallowest nodes in the search tree first."""
 
     #  Get initial state and 
-    root = search_problem.getStartState()
+    root_state = search_problem.getStartState()
+    root = {
+        'state': root_state,
+        'depth': 0,
+        'action': None,
+        'parent': None
+    }
 
     # Create Queue
     queue = util.Queue()
     queue.push(root)
 
     visited = []
+    num_visited = 0
 
     # Expandir mientras haya nodos en la cola
     while not queue.isEmpty():
         node = queue.pop()
         current_depth = node['depth']
-        #visited.append(node)
+        current_state = node['state']
 
-        if node not in visited:
-            visited.append(node)
 
+        if current_state in visited:
+            continue # skipea this one
+
+        visited.append(current_state)
+        num_visited += 1
 
         if search_problem.isGoalState(node['state']):
-                    return visited # RETURN THE PATH OF STATES
+
+            i = node
+            path = []
+            while i['parent'] is not None:
+                path.append(i['action'])
+                i = i['parent']
+
+            return num_visited, path #node['parent'] # RETURN THE PATH OF STATES
 
 
 
         successors = search_problem.getSuccessors(node['state'])
-
         if successors:
             for succ_state, action in successors:
                 child = {
                     'state': succ_state,
                     'depth': current_depth + 1,
                     'action': action,
-                    'children': []
+                    'parent': node 
+                        # Podria haber hecho que fuese una lista e ir haciendo
+                        # parents = parents del node + node
+                        # Pero temia que ocupase mucha memoria el crear varias 
+                        # copias succesors por cada casilla y estado
                 }
-                node['children'].append(child)
 
                 queue.push(child)
 
@@ -397,25 +416,29 @@ def aStarSearch(search_problem, heuristic=nullHeuristic):
     queue = util.PriorityQueue() 
         # Se añadiran tuplas de
         # [valor funcion, valor real g, estado actual, camino recorrido]
-    queue.push([0 + heuristic(root, search_problem), 0, root, [root]]) 
+
+    first_value = heuristic(root, search_problem)
+    queue.push([0 + first_value, 0, root, []], first_value) 
 
     visited = [] 
+    num_visited = 0
 
     while queue:
-        f, g, actual, camino = queue.pop
+        f, g, actual, camino = queue.pop()
+        num_visited += 1
 
         if search_problem.isGoalState(actual):
-            return camino
+            return num_visited, camino
 
         # Estados siguientes
-        futures = search_problem.getSuccesors(actual)
+        futures = search_problem.getSuccessors(actual)
 
-        for future in futures:
+        for future, action in futures:
             if future not in visited:
                 nuevo_g = g + 1 # En reversi el coste es un paso (1)
                 nuevo_f = nuevo_g + heuristic(actual, search_problem)
 
-                queue.push([nuevo_f, nuevo_g, future, (camino + [future]) ], nuevo_f)
+                queue.push([nuevo_f, nuevo_g, future, (camino + [action]) ], nuevo_f)
 
 
 
@@ -483,7 +506,10 @@ if __name__ == '__main__':
     for method in ['DFS', 'BFS']:
         start = timer()
         if method == 'DFS':
-            visited, path = depthFirstSearch(problem)
+            #visited, path = depthFirstSearch(problem)
+            # Saltado depth First Search Por ahora...
+            visited, path = breadthFirstSearch(problem)
+
         elif method == 'BFS':
             visited, path = breadthFirstSearch(problem)
         end = timer()
