@@ -292,22 +292,22 @@ def depthFirstSearch(search_problem):
     """
     num_visited = 0
     structure = util.Stack()
-    structure.push("""YOUR CODE HERE""") # DEFINE THE INITIAL STATE
+    structure.push([(search_problem.getStartState(), None)]) # DEFINE THE INITIAL STATE
     visited = []
 
     while not structure.isEmpty():
         path = structure.pop()
-        current_state =  """YOUR CODE HERE""" # INDEX THE CURRENT STATE
+        current_state = path[-1][0] # INDEX THE CURRENT STATE
 
         if search_problem.isGoalState(current_state):
-            return """YOUR CODE HERE""" # RETURN THE PATH OF STATES
+            return len(visited) + 1, [step[1] for step in path[1:]] # RETURN THE PATH OF STATES
 
         if current_state not in visited:
             visited.append(current_state)
 
             for successor in search_problem.getSuccessors(current_state):
                 if successor[0] not in visited:
-                    new_path = """YOUR CODE HERE""" # CREATE THE NEW PATH OF STATES
+                    new_path = path + [successor] # CREATE THE NEW PATH OF STATES
                     structure.push(new_path)
 
     return num_visited, None
@@ -352,7 +352,7 @@ def breadthFirstSearch(search_problem):
             while i['parent'] is not None:
                 path.append(i['action'])
                 i = i['parent']
-
+            path.reverse()
             return num_visited, path #node['parent'] # RETURN THE PATH OF STATES
 
 
