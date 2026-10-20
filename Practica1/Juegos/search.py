@@ -390,14 +390,69 @@ def simpleHeuristic(state, search_problem=None):
     # it rewards states with more coins
     return len(state.board)
 
-
+# Solucion kiwi_australiano_borde
 def heuristic1(state, search_problem=None):
     "*** YOUR CODE HERE ***"
-    return 0
+
+    state_actual = state.board
+    
+    #color_yo = state.player_max.label
+    #if color_yo == "W":
+    #    color_rival = "B"
+    #else:
+    #    color_rival = "W"
+
+    color_yo    = state.player1
+    color_rival = state.player2
+
+    fichas_yo = sum(1 for v in state_actual.values() if v == color_yo)
+    fichas_rival = sum(1 for v in state_actual.values() if v == color_rival)
+    diferencia_fichas = fichas_yo - fichas_rival
+
+
+
+    
+
+    movimientos_yo = get_valid_moves(
+        state_actual, state.height, state.width, color_yo, color_rival, state.blocked_cell_label, False
+    )
+    movimientos_rival = get_valid_moves(
+        state_actual, state.height, state.width, color_rival, color_yo, state.blocked_cell_label, False
+    )
+
+    diferencia_movilidad = len(movimientos_yo) - len(movimientos_rival)
+
+    bordes_esquinas = [
+        ((1, 1), [(1, 2), (2, 1)]),
+        ((1, 8), [(1, 7), (2, 8)]),
+        ((8, 1), [(7, 1), (8, 2)]),
+        ((8, 8), [(7, 8), (8, 7)])
+    ]
+
+    bordes_yo = 0
+    bordes_rival = 0
+
+    for esquina, posiciones in bordes_esquinas:
+        if state_actual.get(esquina) is None:
+            for pos in posiciones:
+                if state_actual.get(pos) == color_yo:
+                    bordes_yo += 1
+                elif state_actual.get(pos) == color_rival:
+                    bordes_rival += 1
+
+    diferencia_bordes = bordes_yo - bordes_rival
+
+
+    return (
+                diferencia_fichas
+                + 5 * diferencia_movilidad
+                - 5 * diferencia_bordes
+            )
 
 
 def heuristic2(state, search_problem=None):
     "*** YOUR CODE HERE ***"
+    return 0
 
 
 def heuristic3(state, search_problem=None):
@@ -423,7 +478,7 @@ def aStarSearch(search_problem, heuristic=nullHeuristic):
     visited = [] 
     num_visited = 0
 
-    while queue:
+    while not queue.isEmpty():
         f, g, actual, camino = queue.pop()
         num_visited += 1
 
@@ -436,10 +491,11 @@ def aStarSearch(search_problem, heuristic=nullHeuristic):
         for future, action in futures:
             if future not in visited:
                 nuevo_g = g + 1 # En reversi el coste es un paso (1)
-                nuevo_f = nuevo_g + heuristic(actual, search_problem)
+                nuevo_f = nuevo_g + heuristic(future, search_problem)
 
                 queue.push([nuevo_f, nuevo_g, future, (camino + [action]) ], nuevo_f)
 
+        visited.append(actual)
 
 
     raise NotImplementedError
