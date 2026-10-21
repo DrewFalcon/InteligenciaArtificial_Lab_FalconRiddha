@@ -20,7 +20,7 @@ from tournament import StudentHeuristic, Tournament
 from p1_1311_10_Ridda_Falcon import (
     Solution1,
     Solution2,
-    Solution3,
+    Solution3
 )
 
 class Heuristic1(StudentHeuristic):
@@ -122,7 +122,7 @@ strats = {'opt1': [Solution1], 'opt2': [Solution2], 'opt3': [Solution3]}
 # folder_name = "folder_strat" # name of the folder where the strategy files are located
 # strats = tour.load_strategies_from_folder(folder=folder_name, max_strat=3)
 
-n = 5
+n = 2
 scores, totals, names = tour.run(
     student_strategies=strats,
     increasing_depth=False,
