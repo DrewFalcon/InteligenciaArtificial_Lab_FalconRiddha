@@ -303,11 +303,10 @@ class MinimaxAlphaBetaStrategy(Strategy):
                         minimax_value = successor_minimax_value
                         minimax_successor = successor
 
-
-                    # Poda de nodos:
+                    if minimax_value >= beta:
+                        return minimax_value, minimax_successor                    # Poda de nodos:
                     alpha = max(alpha, minimax_value)
-                    if beta <= alpha:
-                        break
+
 
 
     
@@ -355,10 +354,11 @@ class MinimaxAlphaBetaStrategy(Strategy):
                     minimax_value = successor_minimax_value
                     minimax_successor = successor
 
+                if minimax_value <= alpha:
+                    return minimax_value, minimax_successor
                 # Poda de nodos
                 beta = min(beta, minimax_value)
-                if beta <= alpha:
-                    break
+
 
 
 
